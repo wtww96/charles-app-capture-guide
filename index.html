@@ -218,8 +218,8 @@
         <li>安装完成后打开 Charles。</li>
         <li>Windows 如果出现防火墙提示，选择允许 Charles 访问网络。</li>
       </ol>
-      <h3>输入官方授权码的位置</h3>
-      <p>如果已经购买了 Charles License，可以在菜单 <code>Help</code> → <code>Enter Charles License...</code> 输入注册码。</p>
+      <h3>输入Charles 激活码</h3>
+      <p><a href="https://www.zzzmode.com/mytools/charles/" target="_blank" rel="noopener">Charles 工具</a>，然后在菜单 <code>Help</code> → <code>Enter Charles License...</code> 输入注册码。</p>
       <img src="charles-license-menu.png" alt="Charles Help 菜单中的 Enter Charles License 入口">
     </section>
 
@@ -501,10 +501,9 @@
         <a class="button" href="https://raw.githubusercontent.com/wtww96/charles-app-capture-guide/main/Clash.Verge_2.5.1_x64-setup.exe" target="_blank" rel="noopener">下载 VPN 工具 Windows 安装包</a>
       </div>
       <div class="copy-row">
-        <input id="vpn-subscription-input" type="password" autocomplete="off" placeholder="在这里粘贴订阅链接">
-        <button class="button" type="button" onclick="copyVpnSubscription()">复制输入框内容</button>
+        <button class="button" type="button" onclick="copyVpnSubscription()">复制</button>
       </div>
-      <p id="vpn-copy-status" class="copy-status">订阅链接只在当前输入框里显示为密码样式，网页不会保存。</p>
+      <p id="vpn-copy-status" class="copy-status">点击按钮复制订阅内容。</p>
       <ol>
         <li>下载并安装工具，获取订阅链接。</li>
         <li>打开 VPN 工具，点击左侧 <code>订阅</code>，再点击右上角 <code>新建</code>。</li>
@@ -533,24 +532,16 @@
   </main>
   <script>
     function copyVpnSubscription() {
-      var input = document.getElementById('vpn-subscription-input');
       var status = document.getElementById('vpn-copy-status');
-      var value = input.value.trim();
-      if (!value) {
-        status.textContent = '请先把订阅链接粘贴到输入框里。';
-        input.focus();
-        return;
-      }
+      var value = 'https://sub.20250715iplcsub.link/qC8zV8qS1kB1lX2u/IpivkTPg8VoBvkXj';
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(value).then(function () {
-          status.textContent = '已复制输入框里的订阅链接。';
+          status.textContent = '已复制。';
         }).catch(function () {
-          input.select();
-          status.textContent = '自动复制失败，请按 Ctrl + C 手动复制。';
+          status.textContent = '自动复制失败，请手动复制：123456789';
         });
       } else {
-        input.select();
-        status.textContent = '当前浏览器不支持自动复制，请按 Ctrl + C 手动复制。';
+        status.textContent = '当前浏览器不支持自动复制，请手动复制：123456789';
       }
     }
   </script>
