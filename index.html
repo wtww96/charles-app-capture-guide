@@ -95,6 +95,11 @@
     .warning { border-left-color: var(--amber); background: #fff8e1; }
     .danger { border-left-color: var(--red); background: #fff4f2; }
     .ok { border-left-color: var(--green); background: #f1f8f4; }
+    .notice-red {
+      color: var(--red);
+      font-weight: 700;
+      font-size: 18px;
+    }
     .step {
       margin: 14px 0;
       padding: 14px 16px;
@@ -193,8 +198,8 @@
         <li>安装完成后打开 Charles。</li>
         <li>Windows 如果出现防火墙提示，选择允许 Charles 访问网络。</li>
       </ol>
-      <h3>输入破解版Charles 激活码</h3>
-      <p><a href="https://www.zzzmode.com/mytools/charles/" target="_blank" rel="noopener">Charles 破解工具</a>，然后在菜单 <code>Help</code> → <code>Enter Charles License...</code> 输入注册码。</p>
+      <h3>输入官方授权码的位置</h3>
+      <p>如果已经购买了 Charles License，可以在菜单 <code>Help</code> → <code>Enter Charles License...</code> 输入注册码。</p>
       <img src="charles-license-menu.png" alt="Charles Help 菜单中的 Enter Charles License 入口">
     </section>
 
@@ -481,10 +486,22 @@
       <ol>
         <li>下载并安装工具。</li>
         <li>从内部渠道复制订阅链接。注意：订阅链接是复制到 VPN 工具里使用，不是在浏览器里打开。</li>
-        <li>打开 VPN 工具，找到 <code>Profiles</code>、<code>订阅</code>、<code>Import</code>、<code>从 URL 导入</code> 或类似入口。</li>
-        <li>粘贴订阅链接并保存，等待节点列表刷新。</li>
-        <li>确认 VPN / 代理连接成功后，再按前面的步骤配置 Charles 和手机代理。</li>
+        <li>打开 VPN 工具，点击左侧 <code>订阅</code>，再点击右上角 <code>新建</code>。</li>
+        <li>在新建配置窗口中，把复制好的订阅链接粘贴到 <code>订阅链接</code> 输入框，然后点击 <code>保存</code>。</li>
+        <li>保存成功后，订阅页会出现一个订阅卡片。点击左侧 <code>首页</code>。</li>
+        <li>在首页右侧选择一个国外节点，后面的绿色数字表示延迟，数字越小通常越快。</li>
+        <li>在首页的网络设置里选择 <code>虚拟网卡模式</code>，打开开关。确认 VPN / 代理连接成功后，再按前面的步骤配置 Charles 和手机代理。</li>
       </ol>
+      <p class="notice-red">重要：不使用的时候关闭 VPN 工具里的开关；关机前也需要先关闭这个开关。不然重新启动电脑后可能连不上网络，再次打开工具点击关闭开关即可恢复正常联网。</p>
+      <h3>图示步骤</h3>
+      <p>1. 点击左侧订阅，再点击右上角新建。</p>
+      <img src="vpn-subscription-new.png" alt="Clash Verge 订阅页点击新建">
+      <p>2. 将复制好的订阅链接粘贴到订阅链接输入框，然后点击保存。</p>
+      <img src="vpn-subscription-paste.png" alt="Clash Verge 新建配置粘贴订阅链接并保存">
+      <p>3. 保存后订阅页会显示订阅卡片，然后点击左侧首页。</p>
+      <img src="vpn-subscription-success.png" alt="Clash Verge 订阅保存成功后点击首页">
+      <p>4. 在首页选择节点，打开虚拟网卡模式。需要断开时关闭这个开关。</p>
+      <img src="vpn-home-enable-node.png" alt="Clash Verge 首页选择节点并打开虚拟网卡模式">
     </section>
 
     <footer>
