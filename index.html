@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Charles 手机 App 抓包教程</title>
+  <style>
+    :root {
+      --ink: #202124;
+      --muted: #5f6368;
+      --line: #dadce0;
+      --soft: #f7f8fa;
+      --blue: #1a73e8;
+      --green: #137333;
+      --red: #b3261e;
+      --amber: #8a5a00;
+      --code: #f1f3f4;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+      color: var(--ink);
+      background: #fff;
+      line-height: 1.68;
+      font-size: 16px;
+    }
+    header {
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #fff 0%, #f8fbff 100%);
+    }
+    .wrap {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 28px 22px;
+    }
+    h1 { margin: 0 0 10px; font-size: 32px; line-height: 1.25; letter-spacing: 0; }
+    h2 {
+      margin: 34px 0 12px;
+      padding-top: 8px;
+      border-top: 1px solid var(--line);
+      font-size: 24px;
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+    h3 { margin: 24px 0 8px; font-size: 18px; line-height: 1.4; letter-spacing: 0; }
+    p { margin: 8px 0 12px; }
+    ul, ol { margin: 8px 0 16px 24px; padding: 0; }
+    li { margin: 6px 0; }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code {
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: var(--code);
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+      font-size: 0.92em;
+      word-break: break-all;
+    }
+    img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      margin: 10px 0 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #111;
+    }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0 18px; font-size: 15px; }
+    th, td { border: 1px solid var(--line); padding: 10px 12px; text-align: left; vertical-align: top; }
+    th { background: var(--soft); font-weight: 700; }
+    .lead { color: var(--muted); max-width: 820px; font-size: 17px; }
+    .toc {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .toc a {
+      display: block;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+    }
+    .callout {
+      margin: 16px 0;
+      padding: 14px 16px;
+      border-left: 4px solid var(--blue);
+      background: #f3f8ff;
+      border-radius: 6px;
+    }
+    .warning { border-left-color: var(--amber); background: #fff8e1; }
+    .danger { border-left-color: var(--red); background: #fff4f2; }
+    .ok { border-left-color: var(--green); background: #f1f8f4; }
+    .step {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .step strong { display: inline-block; margin-bottom: 4px; }
+    .buttons { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 9px 14px;
+      border: 1px solid var(--blue);
+      border-radius: 6px;
+      background: var(--blue);
+      color: #fff;
+      font-weight: 700;
+      text-decoration: none;
+      font-family: inherit;
+      font-size: 15px;
+    }
+    .button:hover { text-decoration: none; filter: brightness(0.96); }
+    .kbd {
+      display: inline-block;
+      min-width: 24px;
+      padding: 1px 6px;
+      border: 1px solid #c7c7c7;
+      border-bottom-width: 2px;
+      border-radius: 4px;
+      background: #fff;
+      font-size: 0.88em;
+      text-align: center;
+    }
+    .caption { color: var(--muted); font-size: 14px; margin-top: -8px; }
+    footer {
+      margin-top: 36px;
+      padding: 20px 0 4px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 14px;
+    }
+    @media print {
+      header { background: #fff; }
+      .toc, .buttons { display: none; }
+      a { color: var(--ink); text-decoration: none; }
+      .wrap { max-width: none; padding: 18px; }
+      h2 { page-break-after: avoid; }
+      .step, .callout, table, img { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>Charles 手机 App 抓包教程</h1>
+      <p class="lead">适用于测试人员查看 iOS 手机和 Android 手机 App 的接口请求、请求参数、响应数据、状态码和耗时。流程按 Windows 电脑 + 手机真机测试整理。</p>
+      <div class="callout ok">
+        <strong>目标：</strong>让手机 App 的网络请求出现在 Charles 左侧列表里，然后能分清哪些是业务接口、哪些只是图片、广告、统计或加密连接。
+      </div>
+      <div class="callout">
+        <strong>配合学习：</strong>
+        <a href="https://www.bilibili.com/video/BV1jSYPz3Exu?vd_source=2801f72e818990a79d50861ad333ebc8&spm_id_from=333.788.videopod.episodes" target="_blank" rel="noopener">B 站入门视频</a>、
+        <a href="https://www.cnblogs.com/haima/p/19004934" target="_blank" rel="noopener">博客园图文教程</a>、
+        <a href="https://blog.usword.cn/frontend/debug-skill/charles.html" target="_blank" rel="noopener">Charles 调试技巧</a>。
+      </div>
+      <nav class="toc" aria-label="目录">
+        <a href="#download">1. 下载和安装 Charles</a>
+        <a href="#ip">2. 找到 Windows 正确 IP</a>
+        <a href="#proxy">3. 手机设置代理</a>
+        <a href="#allow">4. Charles 弹窗点 Allow</a>
+        <a href="#connected">5. 验证是否连上</a>
+        <a href="#ssl">6. HTTPS 证书和 Encrypted</a>
+        <a href="#interface">7. Charles 界面怎么看</a>
+        <a href="#data">8. 抓接口时看什么数据</a>
+        <a href="#export">9. 保存和导出</a>
+        <a href="#trouble">10. 常见问题</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section id="download">
+      <h2>1. 下载和安装 Charles</h2>
+      <p>直接从 Charles 官网下载。Charles 是商业软件，通常可以先试用，常见试用期按 30 天理解，具体以软件实际提示为准；试用结束后建议购买官方授权，避免授权异常影响测试工作。</p>
+      <div class="buttons">
+        <a class="button" href="https://www.charlesproxy.com/download/" target="_blank" rel="noopener">打开 Charles 官方下载页</a>
+      </div>
+      <ol>
+        <li>Windows 电脑：在官网下载页选择 Windows 版本，优先用官网推荐的安装包。</li>
+        <li>Mac 电脑：在官网下载页选择 macOS 版本。</li>
+        <li>安装完成后打开 Charles。</li>
+        <li>Windows 如果出现防火墙提示，选择允许 Charles 访问网络。</li>
+      </ol>
+      <h3>输入破解版Charles 激活码</h3>
+      <p><a href="https://www.zzzmode.com/mytools/charles/" target="_blank" rel="noopener">Charles 破解工具</a>，然后在菜单 <code>Help</code> → <code>Enter Charles License...</code> 输入注册码。</p>
+      <img src="charles-license-menu.png" alt="Charles Help 菜单中的 Enter Charles License 入口">
+    </section>
+
+    <section id="ip">
+      <h2>2. 找到 Windows 正确 IP</h2>
+      <p>手机代理里要填的是电脑当前 Wi-Fi 网卡的 IPv4 地址。只看 <code>无线局域网适配器 WLAN</code>、<code>WLAN</code> 或 <code>Wi-Fi</code> 下面的 <code>IPv4 地址</code>。</p>
+      <div class="step">
+        <strong>Windows 查看方法</strong>
+        <ol>
+          <li>按 <span class="kbd">Win</span> + <span class="kbd">R</span>。</li>
+          <li>输入 <code>cmd</code>，回车。</li>
+          <li>输入 <code>ipconfig</code>，回车。</li>
+          <li>找到 <code>无线局域网适配器 WLAN</code>。</li>
+          <li>复制它下面的 <code>IPv4 地址</code>，等下填到手机代理的“服务器”里。</li>
+        </ol>
+      </div>
+      <p>正确示例：看 WLAN 这一块的 IPv4 地址。</p>
+      <img src="ip-wlan-correct-masked.png" alt="Windows WLAN IPv4 地址示例，地址已打码">
+    </section>
+
+    <section id="proxy">
+      <h2>3. 手机设置代理</h2>
+      <h3>iOS 手机抓包配置</h3>
+      <ol>
+        <li>iPhone 打开 <code>设置</code> → <code>无线局域网</code>。</li>
+        <li>点击当前 Wi-Fi 右侧的 <code>i</code>。</li>
+        <li>拉到最下面，点击 <code>配置代理</code>。</li>
+        <li>选择 <code>手动</code>。</li>
+        <li><code>服务器</code> 填第 2 步查到的 Windows WLAN IPv4 地址。</li>
+        <li><code>端口</code> 填 <code>8888</code>。</li>
+        <li>点击 <code>存储</code>。</li>
+      </ol>
+      <h3>Android 手机抓包配置</h3>
+      <ol>
+        <li>Android 手机打开 <code>设置</code> → <code>WLAN / Wi-Fi</code>。</li>
+        <li>点击当前 Wi-Fi 详情，或长按当前 Wi-Fi 选择修改网络。</li>
+        <li>代理选择 <code>手动</code>。</li>
+        <li><code>代理主机名</code> 填第 2 步查到的 Windows WLAN IPv4 地址。</li>
+        <li><code>代理端口</code> 填 <code>8888</code>。</li>
+        <li>保存。</li>
+      </ol>
+    </section>
+
+    <section id="allow">
+      <h2>4. Charles 弹窗点 Allow</h2>
+      <p>手机设置代理后，只要手机开始访问网络，Charles 可能会弹出连接确认窗口。这个窗口是在问：是否允许这台手机把请求发到 Charles。</p>
+      <img src="charles-allow-popup-masked.png" alt="Charles 连接请求弹窗示例，IP 已打码">
+      <p class="caption">看到这个弹窗时，点击 <code>Allow</code>。如果点了 <code>Deny</code>，这台手机这次就会被拒绝。</p>
+      <h3>如果没有弹窗</h3>
+      <ol>
+        <li>先不要急，之前允许过的话可能不会再弹。</li>
+        <li>用第 5 步的方法验证 Charles 左侧有没有请求。</li>
+        <li>如果确实想重新弹出，进入 <code>Proxy</code> → <code>Access Control Settings...</code>，删除已有手机记录，再重新设置手机代理并访问网页。</li>
+      </ol>
+    </section>
+
+    <section id="connected">
+      <h2>5. 验证是否连上</h2>
+      <p>安装、IP、代理、Allow 都做完后，用手机浏览器访问一个普通网页来判断是否真的连上。</p>
+      <ol>
+        <li>电脑保持 Charles 打开。</li>
+        <li>手机浏览器打开 <code>http://example.com</code>。</li>
+        <li>看 Charles 左侧是否出现 <code>example.com</code>。</li>
+      </ol>
+      <img src="charles-example-connected.png" alt="Charles 左侧出现 example.com，说明手机代理已连上">
+      <p class="caption">如图，左侧出现 <code>example.com</code>，说明手机已经通过 Charles 代理访问网络。</p>
+      <div class="callout ok">
+        <strong>判断标准：</strong>能看到 <code>example.com</code> 或手机访问过的网站域名，说明手机已经连上 Charles。后面抓不到 App 明文，通常就是 HTTPS 证书、SSL Proxying、App 证书锁定或 Android 系统限制的问题。
+      </div>
+    </section>
+
+    <section id="ssl">
+      <h2>6. HTTPS 证书和 Encrypted</h2>
+      <p>Charles 左侧看到 <code>Encrypted</code>，意思是这些 HTTPS 连接还没有被 Charles 解密。能看到域名，不一定能看到里面的请求参数和返回内容。</p>
+      <img src="charles-main-interface.png" alt="Charles 主界面示例，左侧有业务域名和 Encrypted 分组">
+      <h3>电脑需要安装证书吗</h3>
+      <p>如果只是抓手机 App，电脑通常不需要安装 Charles 证书。手机 App 的 HTTPS 请求是在手机上发起的，所以重点是手机安装并信任 Charles 证书。</p>
+      <p>只有在抓电脑浏览器、电脑客户端、桌面软件的 HTTPS 请求时，才需要在电脑上安装并信任 Charles 根证书。Windows 上入口是 <code>Help</code> → <code>SSL Proxying</code> → <code>Install Charles Root Certificate</code>，然后把证书放到受信任的根证书颁发机构里。</p>
+      <h3>iOS 安装证书</h3>
+      <ol>
+        <li>手机代理保持开启。</li>
+        <li>iPhone Safari 打开 <code>http://chls.pro/ssl</code>。</li>
+        <li>允许下载描述文件。</li>
+        <li>进入 <code>设置</code>，点击顶部的 <code>已下载描述文件</code>，安装 Charles 证书。</li>
+        <li>再进入 <code>设置</code> → <code>通用</code> → <code>关于本机</code> → <code>证书信任设置</code>。</li>
+        <li>打开 <code>Charles Proxy CA</code> 的完全信任。</li>
+      </ol>
+      <h3>Android 安装证书</h3>
+      <ol>
+        <li>手机代理保持开启。</li>
+        <li>Android 浏览器打开 <code>http://chls.pro/ssl</code>。</li>
+        <li>下载证书。</li>
+        <li>进入系统设置搜索 <code>安装证书</code>、<code>CA 证书</code> 或 <code>加密与凭据</code>。</li>
+        <li>选择从存储安装 CA 证书。</li>
+      </ol>
+      <div class="callout danger">
+        <strong>Android 重点：</strong>Android 7.0 及以上，App 默认不信任用户安装的 CA 证书。浏览器能解密，不代表 App 一定能解密。要抓 App HTTPS 明文，通常需要开发提供 debug 测试包，并允许 debug 包信任用户证书。
+      </div>
+      <h3>对接口域名开启 SSL Proxying</h3>
+      <ol>
+        <li>手机打开 App，操作登录、首页、列表等页面。</li>
+        <li>Charles 左侧找到 App 的接口域名。</li>
+        <li>右键这个域名。</li>
+        <li>点击 <code>Enable SSL Proxying</code>。</li>
+        <li>完全关闭 App 后重新打开，再操作一遍。</li>
+      </ol>
+    </section>
+
+    <section id="interface">
+      <h2>7. Charles 界面怎么看</h2>
+      <p>Charles 左侧是请求列表，右侧是选中请求的详情。官方文档也说明，Charles 可以用结构视图按域名和路径组织请求，点中请求后右侧会显示请求和响应详情。</p>
+      <table>
+        <thead>
+          <tr><th>界面位置</th><th>怎么看</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>左上两个视图按钮</td>
+            <td>一个是按时间顺序看请求，一个是按域名和文件夹结构看请求。新手建议用结构视图，更容易找接口域名。</td>
+          </tr>
+          <tr>
+            <td>左侧域名</td>
+            <td>例如 <code>api.xxx.com</code>、<code>m.xxx.com</code>、<code>img.xxx.com</code>。业务接口通常在 api、gateway、service、app、m 这类域名下。</td>
+          </tr>
+          <tr>
+            <td>图片、favicon、jpg、png</td>
+            <td>这些多半是静态资源，不是接口问题的重点。</td>
+          </tr>
+          <tr>
+            <td><code>Encrypted</code></td>
+            <td>HTTPS 加密分组。里面如果只是第三方域名、广告、统计、聊天、系统服务，通常不用管；如果是 App 接口域名，就要装证书并开启 SSL Proxying。</td>
+          </tr>
+          <tr>
+            <td>右侧 <code>Overview</code></td>
+            <td>看 Host、Path、Protocol、请求数量、是否失败。</td>
+          </tr>
+          <tr>
+            <td>右侧 <code>Summary</code></td>
+            <td>看请求概览，适合快速确认某个域名下面有哪些路径。</td>
+          </tr>
+          <tr>
+            <td>右侧 <code>Chart</code></td>
+            <td>看耗时和请求分布，排查慢接口时有用。</td>
+          </tr>
+          <tr>
+            <td>顶部垃圾桶图标</td>
+            <td>清空当前会话记录。抓一个新场景前可以先点它，避免旧请求干扰。</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="callout warning">
+        <strong>关于录制按钮：</strong>不同 Charles 版本界面不完全一样。如果看不到红色录制按钮，就用菜单 <code>Proxy</code> 里和 Recording 相关的选项判断是否正在记录。只要左侧会新增请求，就说明正在记录。
+      </div>
+    </section>
+
+    <section id="data">
+      <h2>8. 抓接口时看什么数据</h2>
+      <p>流程跑通后，真正要看的不是“所有请求”，而是和你刚才 App 操作对应的那几条业务接口。</p>
+      <h3>8.1 先过滤出业务接口</h3>
+      <ol>
+        <li>点垃圾桶清空旧记录。</li>
+        <li>在 App 里只做一个动作，例如点击登录、打开列表、提交订单。</li>
+        <li>回 Charles 左侧看新增了哪些域名和路径。</li>
+        <li>优先看 <code>api</code>、<code>gateway</code>、<code>service</code>、<code>app</code>、<code>m</code> 这类域名。</li>
+        <li>先忽略图片域名、广告 SDK、统计 SDK、系统服务域名。</li>
+      </ol>
+      <h3>8.2 点开一条接口后看这些字段</h3>
+      <table>
+        <thead>
+          <tr><th>字段</th><th>代表什么</th><th>测试时怎么用</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Host</td>
+            <td>域名</td>
+            <td>判断是不是业务服务器。</td>
+          </tr>
+          <tr>
+            <td>Path / URL</td>
+            <td>接口路径</td>
+            <td>判断具体接口，例如登录、列表、详情、提交。</td>
+          </tr>
+          <tr>
+            <td>Method</td>
+            <td>请求方法，如 <code>GET</code>、<code>POST</code></td>
+            <td><code>GET</code> 多用于查询，<code>POST</code> 多用于提交。</td>
+          </tr>
+          <tr>
+            <td>Status</td>
+            <td>HTTP 状态码</td>
+            <td><code>200</code> 通常成功；<code>401</code> 多为登录失效；<code>403</code> 多为无权限；<code>404</code> 地址不对；<code>500</code> 服务端异常。</td>
+          </tr>
+          <tr>
+            <td>Query / Form / JSON Body</td>
+            <td>请求参数</td>
+            <td>看 App 有没有把正确参数传给服务端。</td>
+          </tr>
+          <tr>
+            <td>Response</td>
+            <td>服务端返回</td>
+            <td>看接口返回是否成功、错误码是什么、数据字段是否符合预期。</td>
+          </tr>
+          <tr>
+            <td>Timing / Chart</td>
+            <td>耗时</td>
+            <td>判断接口慢不慢，是否卡在 DNS、连接、等待响应。</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3>8.3 新手最常用的记录模板</h3>
+      <div class="step">
+        <p><strong>App 操作：</strong>例如点击登录按钮</p>
+        <p><strong>接口域名：</strong>例如 api / gateway 相关域名</p>
+        <p><strong>接口路径：</strong>从 Path / URL 复制</p>
+        <p><strong>请求参数：</strong>截图或复制 Query / JSON Body</p>
+        <p><strong>返回状态：</strong>HTTP 状态码 + 业务 code</p>
+        <p><strong>返回内容：</strong>关键 response 字段</p>
+        <p><strong>问题描述：</strong>App 页面显示什么、接口返回什么、预期应该是什么</p>
+      </div>
+    </section>
+
+    <section id="export">
+      <h2>9. 保存和导出</h2>
+      <ol>
+        <li>抓完后点击 <code>File</code> → <code>Save Session As...</code>。</li>
+        <li>保存为 <code>.chls</code> 文件，开发可以用 Charles 打开。</li>
+        <li>也可以点击 <code>File</code> → <code>Export Session...</code>，导出 <code>.har</code>。</li>
+      </ol>
+      <div class="callout danger">
+        <strong>注意：</strong>抓包文件可能包含手机号、Token、Cookie、密码等敏感信息。发给别人前确认是否需要脱敏。
+      </div>
+    </section>
+
+    <section id="trouble">
+      <h2>10. 常见问题</h2>
+      <table>
+        <thead>
+          <tr><th>现象</th><th>原因</th><th>处理</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>手机设置代理后不能上网</td>
+            <td>IP 或端口错；Charles 没打开；防火墙拦截。</td>
+            <td>确认填的是 WLAN IPv4；端口是 <code>8888</code>；允许 Charles 通过防火墙。</td>
+          </tr>
+          <tr>
+            <td>Charles 左侧没有任何请求</td>
+            <td>手机没有连到 Charles。</td>
+            <td>手机浏览器打开 <code>http://example.com</code> 测试；检查同一 Wi-Fi 和代理设置。</td>
+          </tr>
+          <tr>
+            <td>有域名，但都在 Encrypted 下面</td>
+            <td>HTTPS 未解密。</td>
+            <td>安装并信任证书，对目标接口域名开启 <code>Enable SSL Proxying</code>。</td>
+          </tr>
+          <tr>
+            <td>iOS 浏览器能抓，App 不能抓</td>
+            <td>App 不走系统代理，或做了 SSL Pinning。</td>
+            <td>让开发确认代理支持，或提供关闭 Pinning 的测试包。</td>
+          </tr>
+          <tr>
+            <td>Android 浏览器能抓，App HTTPS 不能抓</td>
+            <td>Android 7+ App 默认不信任用户证书。</td>
+            <td>让开发提供 debug 包，并配置网络安全策略信任用户 CA。</td>
+          </tr>
+          <tr>
+            <td>测试完手机不能上网</td>
+            <td>手机还开着手动代理，但电脑 Charles 关了。</td>
+            <td>把手机 Wi-Fi 代理改回关闭。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <footer>
+      <p>配合学习：<a href="https://www.bilibili.com/video/BV1jSYPz3Exu?vd_source=2801f72e818990a79d50861ad333ebc8&spm_id_from=333.788.videopod.episodes" target="_blank" rel="noopener">B 站入门视频</a>、<a href="https://www.cnblogs.com/haima/p/19004934" target="_blank" rel="noopener">博客园图文教程</a>、<a href="https://blog.usword.cn/frontend/debug-skill/charles.html" target="_blank" rel="noopener">Charles 调试技巧</a>。</p>
+      <p>官方参考资料：<a href="https://www.charlesproxy.com/download/" target="_blank" rel="noopener">Charles 下载页</a>、<a href="https://www.charlesproxy.com/documentation/getting-started/" target="_blank" rel="noopener">Getting Started</a>、<a href="https://www.charlesproxy.com/documentation/using-charles/requests-responses/" target="_blank" rel="noopener">Requests &amp; Responses</a>、<a href="https://www.charlesproxy.com/documentation/using-charles/ssl-certificates/" target="_blank" rel="noopener">SSL Certificates</a>、<a href="https://www.charlesproxy.com/documentation/proxying/ssl-proxying/" target="_blank" rel="noopener">SSL Proxying</a>。</p>
+      <p>文档日期：2026-06-13。</p>
+    </footer>
+  </main>
+</body>
+</html>
