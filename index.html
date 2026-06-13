@@ -125,6 +125,26 @@
       font-size: 15px;
     }
     .button:hover { text-decoration: none; filter: brightness(0.96); }
+    .copy-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 12px 0 16px;
+      align-items: stretch;
+    }
+    .copy-row input {
+      flex: 1 1 360px;
+      min-height: 42px;
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      font: inherit;
+    }
+    .copy-status {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: -6px;
+    }
     .kbd {
       display: inline-block;
       min-width: 24px;
@@ -480,12 +500,13 @@
       <div class="buttons">
         <a class="button" href="https://raw.githubusercontent.com/wtww96/charles-app-capture-guide/main/Clash.Verge_2.5.1_x64-setup.exe" target="_blank" rel="noopener">下载 VPN 工具 Windows 安装包</a>
       </div>
-      <div class="callout warning">
-        <strong>订阅链接安全：</strong>订阅链接相当于访问凭证，不要写在公开网页里。请通过公司内部文档、负责人私聊或其他受控渠道获取订阅链接。
+      <div class="copy-row">
+        <input id="vpn-subscription-input" type="password" autocomplete="off" placeholder="在这里粘贴订阅链接">
+        <button class="button" type="button" onclick="copyVpnSubscription()">复制输入框内容</button>
       </div>
+      <p id="vpn-copy-status" class="copy-status">订阅链接只在当前输入框里显示为密码样式，网页不会保存。</p>
       <ol>
-        <li>下载并安装工具。</li>
-        <li>从内部渠道复制订阅链接。注意：订阅链接是复制到 VPN 工具里使用，不是在浏览器里打开。</li>
+        <li>下载并安装工具，获取订阅链接。</li>
         <li>打开 VPN 工具，点击左侧 <code>订阅</code>，再点击右上角 <code>新建</code>。</li>
         <li>在新建配置窗口中，把复制好的订阅链接粘贴到 <code>订阅链接</code> 输入框，然后点击 <code>保存</code>。</li>
         <li>保存成功后，订阅页会出现一个订阅卡片。点击左侧 <code>首页</code>。</li>
@@ -510,5 +531,28 @@
       <p>文档日期：2026-06-13。</p>
     </footer>
   </main>
+  <script>
+    function copyVpnSubscription() {
+      var input = document.getElementById('vpn-subscription-input');
+      var status = document.getElementById('vpn-copy-status');
+      var value = input.value.trim();
+      if (!value) {
+        status.textContent = '请先把订阅链接粘贴到输入框里。';
+        input.focus();
+        return;
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(value).then(function () {
+          status.textContent = '已复制输入框里的订阅链接。';
+        }).catch(function () {
+          input.select();
+          status.textContent = '自动复制失败，请按 Ctrl + C 手动复制。';
+        });
+      } else {
+        input.select();
+        status.textContent = '当前浏览器不支持自动复制，请按 Ctrl + C 手动复制。';
+      }
+    }
+  </script>
 </body>
 </html>
